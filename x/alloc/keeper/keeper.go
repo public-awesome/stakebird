@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/public-awesome/stargaze/x/alloc/types"
 	// this line is used by starport scaffolding # ibc/keeper/import
 )
@@ -23,6 +24,7 @@ type (
 		bankKeeper    types.BankKeeper
 		stakingKeeper types.StakingKeeper
 		distrKeeper   types.DistrKeeper
+		paramSpace    paramtypes.Subspace
 	}
 )
 
@@ -34,7 +36,14 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper,
 	stakingKeeper types.StakingKeeper,
 	distrKeeper types.DistrKeeper,
+	paramSpace paramtypes.Subspace,
 ) *Keeper {
+
+	// set KeyTable if it has not already been set
+	if !paramSpace.HasKeyTable() {
+		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	}
+
 	return &Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
@@ -43,6 +52,7 @@ func NewKeeper(
 		accountKeeper: accountKeeper, bankKeeper: bankKeeper,
 		stakingKeeper: stakingKeeper,
 		distrKeeper:   distrKeeper,
+		paramSpace:    paramSpace,
 	}
 }
 
@@ -61,20 +71,18 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 	blockInflation := k.bankKeeper.GetBalance(ctx, blockInflationAddr, k.stakingKeeper.BondDenom(ctx))
 	blockInflationDec := sdk.NewDecFromInt(blockInflation.Amount)
 
-	params, err := k.GetParams(ctx)
-	if err != nil {
-		return err
-	}
+	params := k.GetParams(ctx)
 	proportions := params.DistributionProportions
+	k.Logger(ctx).Info(proportions.String())
 
 	daoRewardAmount := blockInflationDec.Mul(proportions.DaoRewards)
 	daoRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), daoRewardAmount.TruncateInt())
 	// Distribute DAO incentives to the community pool until StargazeDAO is implemented
-	err = k.distrKeeper.FundCommunityPool(ctx, sdk.NewCoins(daoRewardCoin), blockInflationAddr)
+	err := k.distrKeeper.FundCommunityPool(ctx, sdk.NewCoins(daoRewardCoin), blockInflationAddr)
 	if err != nil {
 		return err
 	}
-	k.Logger(ctx).Info("funded community pool")
+	k.Logger(ctx).Info("funded community pool", "amount", daoRewardCoin.String(), "from", blockInflationAddr)
 
 	devRewardAmount := blockInflationDec.Mul(proportions.DeveloperRewards)
 	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount.TruncateInt())
@@ -98,7 +106,7 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 			if err != nil {
 				return err
 			}
-			k.Logger(ctx).Info("sent coins to developer")
+			k.Logger(ctx).Info("sent coins to developer", "amount", devRewardPortionCoins.String(), "from", blockInflationAddr)
 		}
 	}
 
