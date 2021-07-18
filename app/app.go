@@ -93,6 +93,10 @@ import (
 	"github.com/public-awesome/stargaze/x/claim"
 	claimkeeper "github.com/public-awesome/stargaze/x/claim/keeper"
 	claimtypes "github.com/public-awesome/stargaze/x/claim/types"
+
+	"github.com/public-awesome/stargaze/x/alloc"
+	allockeeper "github.com/public-awesome/stargaze/x/alloc/keeper"
+	alloctypes "github.com/public-awesome/stargaze/x/alloc/types"
 )
 
 const appName = "StargazeApp"
@@ -160,6 +164,7 @@ var (
 		// Stargaze Modules
 		wasm.AppModuleBasic{},
 		claim.AppModuleBasic{},
+		alloc.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -173,6 +178,7 @@ var (
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		wasm.ModuleName:                {authtypes.Burner},
 		claimtypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		alloctypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -217,6 +223,7 @@ type StargazeApp struct {
 	// Stargaze Keepers
 	WasmKeeper  wasm.Keeper
 	ClaimKeeper *claimkeeper.Keeper
+	AllocKeeper *allockeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -349,6 +356,16 @@ func NewStargazeApp(
 		app.DistrKeeper,
 	)
 
+	app.AllocKeeper = allockeeper.NewKeeper(
+		appCodec,
+		keys[alloctypes.StoreKey],
+		memKeys[alloctypes.MemStoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		stakingKeeper,
+		app.DistrKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -443,6 +460,7 @@ func NewStargazeApp(
 		// StargazeModules
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper),
 		claim.NewAppModule(appCodec, *app.ClaimKeeper),
+		alloc.NewAppModule(appCodec, *app.AllocKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -452,6 +470,7 @@ func NewStargazeApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName,
 		minttypes.ModuleName,
+		alloctypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -480,6 +499,7 @@ func NewStargazeApp(
 		// stargaze init genesis
 		wasm.ModuleName,
 		claimtypes.ModuleName,
+		alloctypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -739,6 +759,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler,
 
 	// Stargaze Modules
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(alloctypes.ModuleName)
 
 	return paramsKeeper
 }
