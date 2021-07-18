@@ -100,6 +100,10 @@ import (
 	"github.com/public-awesome/stargaze/x/stake"
 	stakekeeper "github.com/public-awesome/stargaze/x/stake/keeper"
 	staketypes "github.com/public-awesome/stargaze/x/stake/types"
+
+	"github.com/public-awesome/stargaze/x/alloc"
+	allockeeper "github.com/public-awesome/stargaze/x/alloc/keeper"
+	alloctypes "github.com/public-awesome/stargaze/x/alloc/types"
 )
 
 const appName = "SimApp"
@@ -139,6 +143,7 @@ var (
 		user.AppModuleBasic{},
 		stake.AppModuleBasic{},
 		claim.AppModuleBasic{},
+		alloc.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -156,6 +161,7 @@ var (
 		curatingtypes.VotingPoolName: {authtypes.Minter, authtypes.Burner},
 		staketypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
 		claimtypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
+		alloctypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -202,6 +208,7 @@ type SimApp struct {
 	UserKeeper     userkeeper.Keeper
 	StakeKeeper    stakekeeper.Keeper
 	ClaimKeeper    *claimkeeper.Keeper
+	AllocKeeper    *allockeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -251,6 +258,7 @@ func NewSimApp(
 		usertypes.StoreKey,
 		staketypes.StoreKey,
 		claimtypes.StoreKey,
+		alloctypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -323,6 +331,17 @@ func NewSimApp(
 		app.BankKeeper,
 		stakingKeeper,
 		app.DistrKeeper,
+	)
+
+	app.AllocKeeper = allockeeper.NewKeeper(
+		appCodec,
+		keys[alloctypes.StoreKey],
+		memKeys[alloctypes.MemStoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		stakingKeeper,
+		app.DistrKeeper,
+		app.GetSubspace(alloctypes.ModuleName),
 	)
 
 	// register the staking hooks
@@ -410,6 +429,7 @@ func NewSimApp(
 		user.NewAppModule(appCodec, app.UserKeeper),
 		stake.NewAppModule(appCodec, app.StakeKeeper, app.CuratingKeeper, app.StakingKeeper),
 		claim.NewAppModule(appCodec, *app.ClaimKeeper),
+		alloc.NewAppModule(appCodec, *app.AllocKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -420,6 +440,7 @@ func NewSimApp(
 		upgradetypes.ModuleName, minttypes.ModuleName,
 		// must run before distribution
 		curatingtypes.ModuleName,
+		alloctypes.ModuleName,
 		distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName, ibchost.ModuleName,
@@ -446,6 +467,7 @@ func NewSimApp(
 		curatingtypes.ModuleName,
 		usertypes.ModuleName,
 		claimtypes.ModuleName,
+		alloctypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -686,6 +708,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler,
 	paramsKeeper.Subspace(curatingtypes.ModuleName)
 	paramsKeeper.Subspace(usertypes.ModuleName)
 	paramsKeeper.Subspace(staketypes.ModuleName)
+	paramsKeeper.Subspace(alloctypes.ModuleName)
 
 	return paramsKeeper
 }

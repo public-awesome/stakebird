@@ -73,7 +73,6 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 
 	params := k.GetParams(ctx)
 	proportions := params.DistributionProportions
-	k.Logger(ctx).Info(proportions.String())
 
 	daoRewardAmount := blockInflationDec.Mul(proportions.DaoRewards)
 	daoRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), daoRewardAmount.TruncateInt())
@@ -82,7 +81,7 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 	if err != nil {
 		return err
 	}
-	k.Logger(ctx).Info("funded community pool", "amount", daoRewardCoin.String(), "from", blockInflationAddr)
+	k.Logger(ctx).Debug("funded community pool", "amount", daoRewardCoin.String(), "from", blockInflationAddr)
 
 	devRewardAmount := blockInflationDec.Mul(proportions.DeveloperRewards)
 	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount.TruncateInt())
@@ -106,7 +105,7 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 			if err != nil {
 				return err
 			}
-			k.Logger(ctx).Info("sent coins to developer", "amount", devRewardPortionCoins.String(), "from", blockInflationAddr)
+			k.Logger(ctx).Debug("sent coins to developer", "amount", devRewardPortionCoins.String(), "from", blockInflationAddr)
 		}
 	}
 

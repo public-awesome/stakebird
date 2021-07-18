@@ -10,11 +10,11 @@ import (
 
 // Parameter store keys
 var (
-	KeyDAOAllocationRatio       = []byte("DAOAllocationRatio")
+	KeyDistributionProportions  = []byte("DistributionProportions")
 	KeyDeveloperRewardsReceiver = []byte("DeveloperRewardsReceiver")
 )
 
-// ParamTable for minting module.
+// ParamTable for module.
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
@@ -30,11 +30,12 @@ func NewParams(
 	}
 }
 
-// default minting module parameters
+// default module parameters
 func DefaultParams() Params {
 	return Params{
 		DistributionProportions: DistributionProportions{
-			DeveloperRewards: sdk.NewDecWithPrec(2, 1), // 0.2
+			DaoRewards:       sdk.NewDecWithPrec(40, 2), // 40%
+			DeveloperRewards: sdk.NewDecWithPrec(10, 2), // 10%
 		},
 		WeightedDeveloperRewardsReceivers: []WeightedAddress{},
 	}
@@ -61,6 +62,7 @@ func (p Params) Validate() error {
 // Implements params.ParamSet
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
+		paramtypes.NewParamSetPair(KeyDistributionProportions, &p.DistributionProportions, validateDistributionProportions),
 		paramtypes.NewParamSetPair(KeyDeveloperRewardsReceiver, &p.WeightedDeveloperRewardsReceivers, validateWeightedDeveloperRewardsReceivers),
 	}
 }
@@ -81,8 +83,11 @@ func validateDistributionProportions(i interface{}) error {
 
 	totalProportions := v.DaoRewards.Add(v.DeveloperRewards)
 
-	if !totalProportions.Equal(sdk.NewDec(1)) {
-		return errors.New("total distributions ratio should be 1")
+	// 50% is allocated to this module
+	// 45% validators
+	// 5% community pool
+	if !totalProportions.Equal(sdk.NewDecWithPrec(50, 2)) {
+		return errors.New("total distributions ratio should be 50%")
 	}
 
 	return nil
