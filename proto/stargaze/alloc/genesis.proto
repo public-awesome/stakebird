@@ -1,5 +1,5 @@
 syntax = "proto3";
-package publicawesome.stargaze.alloc;
+package stargaze.alloc.v1beta1;
 
 // this line is used by starport scaffolding # genesis/proto/import
 
@@ -7,6 +7,6 @@ option go_package = "github.com/public-awesome/stargaze/x/alloc/types";
 
 // GenesisState defines the alloc module's genesis state.
 message GenesisState {
-    // this line is used by starport scaffolding # genesis/proto/state
-    // this line is used by starport scaffolding # ibc/genesis/proto
+  // this line is used by starport scaffolding # genesis/proto/state
+  // this line is used by starport scaffolding # ibc/genesis/proto
 }
