@@ -74,6 +74,7 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 	if err != nil {
 		return err
 	}
+	k.Logger(ctx).Info("funded community pool")
 
 	devRewardAmount := blockInflationDec.Mul(proportions.DeveloperRewards)
 	devRewardCoin := sdk.NewCoin(k.stakingKeeper.BondDenom(ctx), devRewardAmount.TruncateInt())
@@ -97,6 +98,7 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 			if err != nil {
 				return err
 			}
+			k.Logger(ctx).Info("sent coins to developer")
 		}
 	}
 
