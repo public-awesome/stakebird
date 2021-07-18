@@ -1,0 +1,28 @@
+package alloc
+
+import (
+	"time"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/cosmos/cosmos-sdk/telemetry"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/public-awesome/stargaze/x/alloc/keeper"
+	"github.com/public-awesome/stargaze/x/alloc/types"
+)
+
+// BeginBlocker to fund reward pool on every begin block
+func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
+	// if err := k.InflateRewardPool(ctx); err != nil {
+	// 	panic(fmt.Sprintf("Error funding reward pool: %s", err.Error()))
+	// }
+
+}
+
+// EndBlocker called every block, update validator set
+func EndBlocker(ctx sdk.Context, k keeper.Keeper) []abci.ValidatorUpdate {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
+
+	return []abci.ValidatorUpdate{}
+}
