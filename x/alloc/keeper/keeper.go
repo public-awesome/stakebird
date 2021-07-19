@@ -98,9 +98,6 @@ func (k Keeper) DistributeInflation(ctx sdk.Context) error {
 			if err != nil {
 				return err
 			}
-			// // If recipient is vesting account, pay to account according to its vesting condition
-			// err = k.bankKeeper.SendCoinsFromModuleToAccountOriginalVesting(
-			// 	ctx, types.DeveloperVestingModuleAcctName, devRewardsAddr, devRewardPortionCoins)
 			err = k.bankKeeper.SendCoins(ctx, blockInflationAddr, devRewardsAddr, devRewardPortionCoins)
 			if err != nil {
 				return err

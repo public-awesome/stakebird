@@ -86,5 +86,3 @@ func (suite *KeeperTestSuite) TestDistributionToDAOAndDevs() {
 		mintCoin.Amount.ToDec().Mul(params.DistributionProportions.DaoRewards),
 		feePool.CommunityPool.AmountOf(denom))
 }
-
-// TODO: Test with vesting developer account

@@ -18,11 +18,7 @@ func DefaultGenesis() *GenesisState {
 				DaoRewards:       sdk.NewDecWithPrec(40, 2), // 40%
 				DeveloperRewards: sdk.NewDecWithPrec(10, 2), // 10%
 			},
-			WeightedDeveloperRewardsReceivers: []WeightedAddress{
-				// {"stars1xuuv5vucu9h74svhma4ykfvjzu4j0rxrsn0yfk", sdk.NewDecWithPrec(40, 2)},
-				// {"stars1s4ckh9405q0a3jhkwx9wkf9hsjh66nmuu53dwe", sdk.NewDecWithPrec(30, 2)},
-				// {"stars1kdfmfxg4tq68jxvl95h99wq9mvz9lxg6whrsjh", sdk.NewDecWithPrec(30, 2)},
-			},
+			WeightedDeveloperRewardsReceivers: []WeightedAddress{},
 		},
 	}
 }
