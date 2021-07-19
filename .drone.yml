@@ -18,14 +18,14 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: test
-    image: golang:1.15.7
+    image: golang:1.16.6
     commands:
       - apt-get update && apt-get install -y cmake
       - ./scripts/go-test.sh
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15-alpine3.12
+    image: golang:1.16-alpine3.14
     commands:
       - apk add --no-cache ca-certificates build-base git
       - wget https://github.com/CosmWasm/wasmvm/releases/download/v0.15.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
@@ -106,7 +106,7 @@ steps:
         - tag
 
   - name: release
-    image: golang:1.15.7
+    image: golang:1.16.6
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -135,21 +135,21 @@ name: ibc-integration-test
 
 steps:
   - name: gaiad
-    image: golang:1.15.7
+    image: golang:1.16.6
     detach: true
     commands:
       - ./scripts/ci/setup-gaia.sh
     environment:
       GOPROXY: http://goproxy
   - name: stargaze
-    image: golang:1.15.7
+    image: golang:1.16.6
     commands:
       - ./scripts/ci/setup-stargaze.sh
     environment:
       GOPROXY: http://goproxy
     detach: true
   - name: relayer
-    image: golang:1.15.7
+    image: golang:1.16.6
     commands:
       - /bin/bash ./scripts/ci/setup-relayer.sh
     environment:
@@ -165,6 +165,6 @@ depends_on:
   - default-build
 ---
 kind: signature
-hmac: ccdcced6bf40716454e395965d8ccad9be4675014e310f9f6434697af05a688e
+hmac: fc5ff95125ccfdce5ea5519a1d25266448ced5357335ecedabfaea3f82f2ad09
 
 ...
