@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package stargaze.alloc.v1beta1;
+
+option go_package = "github.com/public-awesome/stargaze/x/alloc/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+message WeightedAddress {
+  string address = 1 [ (gogoproto.moretags) = "yaml:\"address\"" ];
+  string weight = 2 [
+    (gogoproto.moretags) = "yaml:\"weight\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message DistributionProportions {
+  string dao_rewards = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.moretags) = "yaml:\"dao_rewards\"",
+    (gogoproto.nullable) = false
+  ];
+  string developer_rewards = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.moretags) = "yaml:\"developer_rewards\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message Params {
+  // distribution_proportions defines the proportion of the minted denom
+  DistributionProportions distribution_proportions = 1
+      [ (gogoproto.nullable) = false ];
+  // address to receive developer rewards
+  repeated WeightedAddress weighted_developer_rewards_receivers = 2 [
+    (gogoproto.moretags) = "yaml:\"developer_rewards_receiver\"",
+    (gogoproto.nullable) = false
+  ];
+}

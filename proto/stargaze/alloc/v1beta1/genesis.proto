@@ -1,0 +1,13 @@
+syntax = "proto3";
+package stargaze.alloc.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "stargaze/alloc/v1beta1/alloc.proto";
+
+option go_package = "github.com/public-awesome/stargaze/x/alloc/types";
+
+// GenesisState defines the alloc module's genesis state.
+message GenesisState {
+  // params defines all the paramaters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
