@@ -12,6 +12,6 @@ message GenesisState {
   // params defines all the paramaters of the module.
   Params params = 1 [ (gogoproto.nullable) = false ];
 
-    // this line is used by starport scaffolding # genesis/proto/state
+  // this line is used by starport scaffolding # genesis/proto/state
   // this line is used by starport scaffolding # ibc/genesis/proto
 }
