@@ -21,7 +21,4 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/stargaze/alloc/v1beta1/params";
   }
-  // this line is used by starport scaffolding # 2
 }
-
-// this line is used by starport scaffolding # 3
