@@ -10,7 +10,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/public-awesome/stargaze/x/alloc/types"
-	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
 type (
@@ -18,7 +17,6 @@ type (
 		cdc      codec.Marshaler
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
-		// this line is used by starport scaffolding # ibc/keeper/attribute
 
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
@@ -32,8 +30,8 @@ func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey,
 	memKey sdk.StoreKey,
-	// this line is used by starport scaffolding # ibc/keeper/parameter
-	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper,
+	accountKeeper types.AccountKeeper,
+	bankKeeper types.BankKeeper,
 	stakingKeeper types.StakingKeeper,
 	distrKeeper types.DistrKeeper,
 	paramSpace paramtypes.Subspace,
@@ -45,10 +43,9 @@ func NewKeeper(
 	}
 
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		memKey:   memKey,
-		// this line is used by starport scaffolding # ibc/keeper/return
+		cdc:           cdc,
+		storeKey:      storeKey,
+		memKey:        memKey,
 		accountKeeper: accountKeeper, bankKeeper: bankKeeper,
 		stakingKeeper: stakingKeeper,
 		distrKeeper:   distrKeeper,
