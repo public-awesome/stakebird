@@ -1,0 +1,22 @@
+syntax = "proto3";
+package stargaze.claim.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/public-awesome/stargaze/x/claim/types";
+
+// Msg defines the claims Msg service.
+service Msg {
+    // Post defines a method for sending a post
+    rpc AfterMintSocialToken(MsgAfterMintSocialToken) returns (MsgAfterMintSocialTokenResponse);
+}
+  
+  message MsgAfterMintSocialToken {
+    option (gogoproto.equal) = true;
+  
+    string sender = 1 [ (gogoproto.moretags) = "yaml:\"sender\"" ];
+  }  
+  
+  message MsgAfterMintSocialTokenResponse {}
+  
+  
